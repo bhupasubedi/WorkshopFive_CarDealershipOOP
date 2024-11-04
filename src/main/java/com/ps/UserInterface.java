@@ -9,10 +9,12 @@ public class UserInterface {
     private static Dealership dealership;
     private static Scanner scanner = new Scanner(System.in);
     private static Scanner inputScanner = new Scanner(System.in);
+    private static ContractFileManager contractFileManager;
 
 
     public static void init() {
         dealership = DealershipFileManager.getDealership();
+        contractFileManager = new ContractFileManager();
     }
 
     public static void display() {
@@ -31,6 +33,7 @@ public class UserInterface {
             System.out.println("7. Search Vehicles by Type");
             System.out.println("8. Add Vehicle");
             System.out.println("9. Remove Vehicle");
+            System.out.println("10. Sale or Lease Vehicle");
 
             System.out.println("99. Exit");
 
@@ -72,8 +75,10 @@ public class UserInterface {
                 case 9:
                     removeVehicle(scanner);
                     break;
-
-                case 0:
+                case 10:
+                    sellOrLeaseVehicle();
+                    break;
+                case 99:
                     System.out.println("Exiting the system. Goodbye!");
                     break;
                 default:
@@ -255,5 +260,61 @@ public class UserInterface {
         } else {
             System.out.println("No vehicle found with VIN: " + vin);
         }
+    }
+    public static void sellOrLeaseVehicle (){
+        System.out.println(" Would you like to sell or lease the Vehicle?");
+        System.out.println(" 1. To sell a Vehicle");
+        System.out.println(" 2. To lease the Vehicle");
+        int choice = inputScanner.nextInt();
+
+        for (Vehicle vehicle : dealership.getAllVehicles()) {
+            System.out.println(vehicle);
+        }
+
+        System.out.println("Enter Vehicle's VIN");
+        int vehicleVin = inputScanner.nextInt();
+
+        Vehicle vehicle = null;
+        for (Vehicle vhcle: dealership.getAllVehicles()) {
+            if (vehicleVin == vhcle.getVin()) {
+                vehicle = vhcle;
+            }
+        }
+
+        if (vehicle != null) {
+            dealership.getAllVehicles().remove(vehicle);
+        }
+
+
+        System.out.println(" What is today's date?");
+        String date = inputScanner.next();
+
+        System.out.println(" What is your name?");
+        String customerName = inputScanner.next();
+
+        System.out.println("what is your Email");
+        String customerEmail = inputScanner.next();
+
+        Contract contract = null;
+        if (1 == choice) {
+            System.out.println(" Would you like to finance the Vehicle?");
+            System.out.println(" 1. Yes");
+            System.out.println(" 2. No");
+            int financeChoice = inputScanner.nextInt();
+            boolean isFinanced;
+            if (1 == financeChoice) {
+                isFinanced = true;
+            } else if (2 == financeChoice) {
+                isFinanced = false;
+            } else {
+                throw new RuntimeException("Invalid Choice...");
+            }
+            contract = new SalesContract(isFinanced, date, customerName, vehicle, customerEmail);
+        } else if (2 == choice) {
+            contract = new LeaseContract(date, customerName, vehicle, customerEmail);
+        } else {
+            throw new RuntimeException("Invalid Choice...");
+        }
+        contractFileManager.saveContract(contract);
     }
 }

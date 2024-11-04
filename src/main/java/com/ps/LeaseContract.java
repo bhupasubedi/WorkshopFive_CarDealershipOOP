@@ -4,12 +4,11 @@ public class LeaseContract extends Contract{
 
     private double expectedEnding;
     private double leaseFee;
-    private double monthlyPayment;
 
-    public LeaseContract(double expectedEnding, double leaseFee, String date, String customerName, String vehicleSold, String customerEmail) {
+    public LeaseContract(String date, String customerName, Vehicle vehicleSold, String customerEmail) {
         super( date,  customerName, vehicleSold, customerEmail);
-        this.expectedEnding = expectedEnding;
-        this.leaseFee = leaseFee;
+        this.expectedEnding = vehicleSold.getPrice() * .5;
+        this.leaseFee = vehicleSold.getPrice() * .07;
     }
 
     public double getLeaseFee() {
@@ -30,11 +29,34 @@ public class LeaseContract extends Contract{
 
     @Override
     public double getTotalPrice() {
-        return 0;
+        return getVehicleSold().getPrice() + getLeaseFee();
     }
 
     @Override
-    public double monthlyPayment() {
-        return 0;
+    public double getMonthlyPayment() {
+        double totalPrice = getTotalPrice();
+        double monthlyRate = 4.0/12/100;
+        double monthlyPayment = totalPrice*(monthlyRate/(1-(Math.pow(1+monthlyRate, -36))));
+        return monthlyPayment;
+    }
+
+    @Override
+    public String toString() {
+        return "LEASE|" +
+                getDate() + "|" +
+                getCustomerName() + "|" +
+                getCustomerEmail() + "|" +
+                getVehicleSold().getVin() + "|" +
+                getVehicleSold().getYear() + "|" +
+                getVehicleSold().getMake() + "|" +
+                getVehicleSold().getModel() + "|" +
+                getVehicleSold().getVehicleType() + "|" +
+                getVehicleSold().getColor() + "|" +
+                getVehicleSold().getOdometer() + "|" +
+                getVehicleSold().getPrice() + "|" +
+                expectedEnding + "|" +
+                leaseFee + "|" +
+                getMonthlyPayment() + "|" +
+                getTotalPrice();
     }
 }
